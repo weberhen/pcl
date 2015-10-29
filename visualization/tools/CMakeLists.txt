@@ -59,3 +59,8 @@ if(WITH_RSSDK)
     target_link_libraries(pcl_real_sense_viewer pcl_common pcl_io pcl_visualization)
 endif()
 
+if(WITH_FREENECT2)
+	PCL_ADD_EXECUTABLE_OPT_BUNDLE(pcl_freenect2_viewer ${SUBSYS_NAME} k4w2_viewer.cpp)
+	target_link_libraries(pcl_freenect2_viewer pcl_common pcl_io pcl_visualization)
+endif()
+
