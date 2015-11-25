@@ -38,12 +38,36 @@
 #include <pcl/io/k4w2_grabber.h>
 #include <libfreenect2/packet_pipeline.h>
 
-pcl::k4w2Grabber::k4w2Grabber()
+pcl::k4w2Grabber::k4w2Grabber(processor p)
     : Grabber(),
-    is_running_(false)
+    is_running_(false),
+    qnan_(std::numeric_limits<float>::quiet_NaN()),
+    undistorted_(512, 424, 4),
+    registered_(512, 424, 4),
+    big_mat_(1920, 1082, 4)
 {
-    dev_ = freenect2_.openDefaultDevice(new libfreenect2::OpenCLPacketPipeline());
+
+    switch(p){
+        case CPU:
+            std::cout << "creating CPU processor" << std::endl;
+            dev_ = freenect2_.openDefaultDevice(new libfreenect2::CpuPacketPipeline());
+            std::cout << "created" << std::endl;
+            break;
+        case OPENCL:
+            std::cout << "creating OpenCL processor" << std::endl;
+            dev_ = freenect2_.openDefaultDevice(new libfreenect2::OpenCLPacketPipeline());
+            break;
+        case OPENGL:
+            std::cout << "creating OpenGL processor" << std::endl;
+            dev_ = freenect2_.openDefaultDevice(new libfreenect2::OpenGLPacketPipeline());
+            break;
+        default:
+            std::cout << "creating CPU processor" << std::endl;
+            dev_ = freenect2_.openDefaultDevice(new libfreenect2::CpuPacketPipeline());
+            break;
+    }
     
+
     listener_ = new libfreenect2::SyncMultiFrameListener(libfreenect2::Frame::Color | libfreenect2::Frame::Ir | libfreenect2::Frame::Depth);
     
     if (dev_ == 0) {
@@ -99,12 +123,30 @@ pcl::k4w2Grabber::getFramesPerSecond() const
     return (frequency_.getFrequency());
 }
 
+void 
+pcl::k4w2Grabber::prepareMake3D(const libfreenect2::Freenect2Device::IrCameraParams & depth_p)
+{
+    const int w = 512;
+    const int h = 424;
+    float * pm1 = colmap_.data();
+    float * pm2 = rowmap_.data();
+    for(int i = 0; i < w; ++i)
+    {
+        *pm1++ = (i - depth_p.cx + 0.5) / depth_p.fx;
+    }
+    for (int i = 0; i < h; i++)
+    {
+        *pm2++ = (i - depth_p.cy + 0.5) / depth_p.fy;
+    }
+}
+
 void pcl::k4w2Grabber::run()
 {
     dev_->start();
 
+    prepareMake3D(dev_->getIrCameraParams());
+
     registration_ = new libfreenect2::Registration(dev_->getIrCameraParams(), dev_->getColorCameraParams());
-    libfreenect2::Frame undistorted(512, 424, 4), registered(512, 424, 4);
 
     while (is_running_)
     {
@@ -114,33 +156,55 @@ void pcl::k4w2Grabber::run()
         if (need_xyzrgb_)
         {
             listener_->waitForNewFrame(frames_);
-            libfreenect2::Frame *rgb = frames_[libfreenect2::Frame::Color];
-            libfreenect2::Frame *ir = frames_[libfreenect2::Frame::Ir];
-            libfreenect2::Frame *depth = frames_[libfreenect2::Frame::Depth];
+            libfreenect2::Frame * rgb = frames_[libfreenect2::Frame::Color];
+            libfreenect2::Frame * depth = frames_[libfreenect2::Frame::Depth];
 
-            registration_->apply(rgb, depth, &undistorted, &registered);
+            registration_->apply(rgb, depth, &undistorted_, &registered_, true, &big_mat_);
+            const short w = undistorted_.width;
+            const short h = undistorted_.height;
+            bool is_dense = true;
 
-            xyzrgb_cloud.reset(new pcl::PointCloud<pcl::PointXYZRGB>(registered.width,registered.height));
-            xyzrgb_cloud->is_dense = false;
+            xyzrgb_cloud.reset(new pcl::PointCloud<pcl::PointXYZRGB>(w, h));
 
-            for (size_t i = 0; i < registered.height; i++)
-            {
-                for (size_t j = 0; j < registered.width; j++)
+            const float * itD0 = (float *)undistorted_.data;
+            const char * itRGB0 = (char *)registered_.data;
+            pcl::PointXYZRGB * itP = &xyzrgb_cloud->points[0];
+            
+            for(int y = 0; y < h; ++y){
+
+                const unsigned int offset = y * w;
+                const float * itD = itD0 + offset;
+                const char * itRGB = itRGB0 + offset * 4;
+                const float dy = rowmap_(y);
+
+                for(size_t x = 0; x < w; ++x, ++itP, ++itD, itRGB += 4)
                 {
-                    float x;
-                    float y;
-                    float z;
-                    float frgb;
-                    registration_->getPointXYZRGB(&undistorted, &registered, i, j, x, y, z, frgb);
-
-                    int pt = i * registered.width + j;
+                    const float depth_value = *itD / 1000.0f;
                     
-                    xyzrgb_cloud->points[pt].x = x;
-                    xyzrgb_cloud->points[pt].y = y;
-                    xyzrgb_cloud->points[pt].z = z;
-                    xyzrgb_cloud->points[pt].rgb = *reinterpret_cast<float*>(&frgb);
+                    if(!std::isnan(depth_value) && !(std::abs(depth_value) < 0.0001)){
+        
+                        const float rx = colmap_(x) * depth_value;
+                        const float ry = dy * depth_value;               
+                        itP->z = depth_value;
+                        itP->x = rx;
+                        itP->y = ry;
+
+                        itP->b = itRGB[0];
+                        itP->g = itRGB[1];
+                        itP->r = itRGB[2];
+                    } else {
+                        itP->z = qnan_;
+                        itP->x = qnan_;
+                        itP->y = qnan_;
+
+                        itP->b = qnan_;
+                        itP->g = qnan_;
+                        itP->r = qnan_;
+                        is_dense = false;
+                    }
                 }
             }
+            xyzrgb_cloud->is_dense = is_dense;
         }
 
         fps_mutex_.lock();

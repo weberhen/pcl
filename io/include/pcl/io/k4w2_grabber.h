@@ -50,9 +50,19 @@
 #include <libfreenect2/libfreenect2.hpp>
 #include <libfreenect2/frame_listener_impl.h>
 #include <libfreenect2/registration.h>
+#include <libfreenect2/packet_pipeline.h>
+#include <Eigen/Core>
+
+#include <limits>
+
 
 namespace pcl
 {
+    enum processor
+    {
+        CPU, OPENCL, OPENGL
+    };
+
     class PCL_EXPORTS k4w2Grabber : public Grabber
     {
     public:
@@ -60,7 +70,7 @@ namespace pcl
             void (sig_cb_k4w2_point_cloud_rgb)
             (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr&);
 
-        k4w2Grabber();
+        k4w2Grabber(processor p = CPU);
         virtual
         ~k4w2Grabber() throw();
 
@@ -90,7 +100,9 @@ namespace pcl
 
     private:
         void
-            run();
+        run();
+
+        void prepareMake3D(const libfreenect2::Freenect2Device::IrCameraParams & depth_p);
 
         // Signals to indicate whether new clouds are available
         boost::signals2::signal<sig_cb_k4w2_point_cloud_rgb>* point_cloud_rgb_signal_;
@@ -111,7 +123,13 @@ namespace pcl
         libfreenect2::Freenect2 freenect2_;
         libfreenect2::Freenect2Device * dev_ = 0;
         libfreenect2::SyncMultiFrameListener * listener_ = 0;
+        libfreenect2::PacketPipeline * pipeline_ = 0;
         libfreenect2::FrameMap frames_;
+        libfreenect2::Frame undistorted_, registered_, big_mat_;
+        Eigen::Matrix<float,512,1> colmap_;
+        Eigen::Matrix<float,424,1> rowmap_;
+        std::string serial_;
+        float qnan_;
     };
 }
 
