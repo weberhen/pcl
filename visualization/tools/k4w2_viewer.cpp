@@ -188,7 +188,7 @@ main(int argc, char** argv)
 
     try
     {
-        pcl::k4w2Grabber grabber;
+        pcl::k4w2Grabber grabber(pcl::OPENGL);
         
         k4w2Viewer<pcl::PointXYZRGB> viewer(grabber);
         viewer.run();
@@ -198,6 +198,5 @@ main(int argc, char** argv)
         print_error("Failed to create a grabber: %s\n", e.what());
         return (1);
     }
-
     return (0);
 }
