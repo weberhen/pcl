@@ -70,7 +70,7 @@ namespace pcl
             void (sig_cb_k4w2_point_cloud_rgb)
             (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr&);
 
-        k4w2Grabber(processor p = CPU);
+        k4w2Grabber(processor p = CPU, std::string serial = std::string());
         virtual
         ~k4w2Grabber() throw();
 

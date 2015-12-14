@@ -38,7 +38,7 @@
 #include <pcl/io/k4w2_grabber.h>
 #include <libfreenect2/packet_pipeline.h>
 
-pcl::k4w2Grabber::k4w2Grabber(processor p)
+pcl::k4w2Grabber::k4w2Grabber(processor p, std::string serial)
     : Grabber(),
     is_running_(false),
     qnan_(std::numeric_limits<float>::quiet_NaN()),
@@ -46,34 +46,51 @@ pcl::k4w2Grabber::k4w2Grabber(processor p)
     registered_(512, 424, 4),
     big_mat_(1920, 1082, 4)
 {
+    if(!serial.empty()){
+        serial_ = serial;
+    }
 
     switch(p){
         case CPU:
             std::cout << "creating CPU processor" << std::endl;
-            dev_ = freenect2_.openDefaultDevice(new libfreenect2::CpuPacketPipeline());
+            if(serial_.empty())
+                dev_ = freenect2_.openDefaultDevice(new libfreenect2::CpuPacketPipeline());
+            else
+                dev_ = freenect2_.openDevice(serial_, new libfreenect2::CpuPacketPipeline());
             std::cout << "created" << std::endl;
             break;
         case OPENCL:
             std::cout << "creating OpenCL processor" << std::endl;
-            dev_ = freenect2_.openDefaultDevice(new libfreenect2::OpenCLPacketPipeline());
+            if(serial_.empty())
+                dev_ = freenect2_.openDefaultDevice(new libfreenect2::OpenCLPacketPipeline());
+            else
+                dev_ = freenect2_.openDevice(serial_, new libfreenect2::OpenCLPacketPipeline());
             break;
         case OPENGL:
             std::cout << "creating OpenGL processor" << std::endl;
-            dev_ = freenect2_.openDefaultDevice(new libfreenect2::OpenGLPacketPipeline());
+            if(serial_.empty())
+                dev_ = freenect2_.openDefaultDevice(new libfreenect2::OpenGLPacketPipeline());
+            else
+                dev_ = freenect2_.openDevice(serial_, new libfreenect2::OpenGLPacketPipeline());
             break;
         default:
             std::cout << "creating CPU processor" << std::endl;
-            dev_ = freenect2_.openDefaultDevice(new libfreenect2::CpuPacketPipeline());
+            if(serial_.empty())
+                dev_ = freenect2_.openDefaultDevice(new libfreenect2::CpuPacketPipeline());
+            else
+                dev_ = freenect2_.openDevice(serial_, new libfreenect2::CpuPacketPipeline());
             break;
     }
     
 
     listener_ = new libfreenect2::SyncMultiFrameListener(libfreenect2::Frame::Color | libfreenect2::Frame::Ir | libfreenect2::Frame::Depth);
     
-    if (dev_ == 0) {
+    if(dev_ == 0){
         PCL_ERROR("no device connected or failure opening the default one!\n");
         exit(1);
     }
+
+    std::cout << "Opening device " << freenect2_.getDefaultDeviceSerialNumber() << std::endl;
     
     dev_->setColorFrameListener(listener_);
     dev_->setIrAndDepthFrameListener(listener_);
