@@ -15,7 +15,7 @@ find_path(FREENECT2_INCLUDE_DIRS NAMES libfreenect2.hpp
 	}
 )
  
-find_library(FREENECT2_LIBRARY NAMES freenect )
+find_library(FREENECT2_LIBRARY NAMES freenect2 )
 
 if(FREENECT2_INCLUDE_DIRS AND FREENECT2_LIBRARY)
   set(FREENECT2_FOUND TRUE)
