@@ -283,7 +283,7 @@ PCL_ADD_GRABBER_DEPENDENCY("Ensenso" "IDS-Imaging Ensenso camera support")
 PCL_ADD_GRABBER_DEPENDENCY("davidSDK" "David Vision Systems SDK support")
 PCL_ADD_GRABBER_DEPENDENCY("DSSDK" "DepthSense SDK support")
 PCL_ADD_GRABBER_DEPENDENCY("RSSDK" "RealSense SDK support")
-PCL_ADD_GRABBER_DEPENDENCY("freenect2" "Kinectv2 grabber support")
+PCL_ADD_GRABBER_DEPENDENCY("Freenect2" "Kinectv2 grabber support")
 
 # metslib
 if (PKG_CONFIG_FOUND)
@@ -438,4 +438,3 @@ MAKE_DEP_GRAPH()
 ### ---[ Finish up
 PCL_WRITE_STATUS_REPORT()
 PCL_RESET_MAPS()
-
