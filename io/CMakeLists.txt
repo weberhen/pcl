@@ -161,6 +161,7 @@ if(build)
     endif()
 	
 	if(WITH_FREENECT2)
+        option(WITH_OPENCL "adds opencl support for freenect2" OFF)
 		set(K4W2_GRABBER_INCLUDES
 			include/pcl/io/k4w2_grabber.h
 		)
