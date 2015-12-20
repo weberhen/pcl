@@ -70,7 +70,7 @@ namespace pcl
             void (sig_cb_k4w2_point_cloud_rgb)
             (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr&);
 
-        k4w2Grabber(processor p = CPU);
+        k4w2Grabber(processor p = CPU, std::string serial = std::string());
         virtual
         ~k4w2Grabber() throw();
 
@@ -129,6 +129,7 @@ namespace pcl
         Eigen::Matrix<float,512,1> colmap_;
         Eigen::Matrix<float,424,1> rowmap_;
         std::string serial_;
+        int map_[512 * 424];
         float qnan_;
     };
 }
