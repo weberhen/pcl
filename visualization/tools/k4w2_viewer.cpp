@@ -55,15 +55,8 @@ void
 printHelp (int,
            char **argv)
 {
-  std::cout << std::endl;
-  std::cout << "****************************************************************************" << std::endl;
-  std::cout << "*                                                                          *" << std::endl;
-  std::cout << "*                          FREENECT2 PCL GRABBER- Usage Guide              *" << std::endl;
-  std::cout << "*                                                                          *" << std::endl;
-  std::cout << "****************************************************************************" << std::endl;
-  std::cout << "Creates a point cloud grabber for the kinect2. Accepts as constructor       " << std::endl;
-  std::cout << "parameter a string specifying a kinect2 serial number       " << std::endl;
-  std::cout << std::endl;
+  PCL_INFO ("Creates a point cloud grabber for the kinect2\n");
+  PCL_INFO ("Accepts as constructor parameter a string specifying a kinect2 serial number\n");
 }
 
 template <typename PointT>
