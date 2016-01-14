@@ -117,12 +117,12 @@ class PCL_EXPORTS k4w2Grabber : public Grabber
   EventFrequency frequency_;
   mutable boost::mutex fps_mutex_;
 
-  libfreenect2::Registration* registration_ = 0;
+  libfreenect2::Registration* registration_;
 
   libfreenect2::Freenect2 freenect2_;
-  libfreenect2::Freenect2Device * dev_ = 0;
-  libfreenect2::SyncMultiFrameListener * listener_ = 0;
-  libfreenect2::PacketPipeline * pipeline_ = 0;
+  libfreenect2::Freenect2Device * dev_;
+  libfreenect2::SyncMultiFrameListener * listener_;
+  libfreenect2::PacketPipeline * pipeline_;
   libfreenect2::FrameMap frames_;
   libfreenect2::Frame undistorted_, registered_, big_mat_;
   Eigen::Matrix<float,512,1> colmap_;

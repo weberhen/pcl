@@ -46,7 +46,7 @@
 #include <pcl/console/print.h>
 #include <pcl/console/parse.h>
 #include <pcl/io/io_exception.h>
-#include <pcl/io/k4w2_grabber.h>
+#include <pcl/io/freenect2_grabber.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
 using namespace pcl::console;

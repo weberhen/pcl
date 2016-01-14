@@ -162,11 +162,11 @@ if(build)
 	
 	if(WITH_FREENECT2)
         option(WITH_OPENCL "adds opencl support for freenect2" OFF)
-		set(K4W2_GRABBER_INCLUDES
-			include/pcl/io/k4w2_grabber.h
+		set(FREENECT2_GRABBER_INCLUDES
+			include/pcl/io/freenect2_grabber.h
 		)
-		set(K4W2_GRABBER_SOURCES
-			src/k4w2_grabber.cpp
+		set(FREENECT2_GRABBER_SOURCES
+			src/freenect2_grabber.cpp
 		)
 	endif()
 
@@ -236,7 +236,7 @@ if(build)
         ${DAVIDSDK_GRABBER_SOURCES}
         ${DSSDK_GRABBER_SOURCES}
         ${RSSDK_GRABBER_SOURCES}
-		${K4W2_GRABBER_SOURCES}
+		${FREENECT2_GRABBER_SOURCES}
         )
     if(PNG_FOUND)
       list(APPEND srcs
@@ -284,7 +284,7 @@ if(build)
         ${DAVIDSDK_GRABBER_INCLUDES}
         ${DSSDK_GRABBER_INCLUDES}
         ${RSSDK_GRABBER_INCLUDES}
-		${K4W2_GRABBER_INCLUDES}
+		${FREENECT2_GRABBER_INCLUDES}
         "include/pcl/${SUBSYS_NAME}/pxc_grabber.h"  # contains only depreciation note
         )
 
@@ -370,7 +370,7 @@ if(build)
     endif()
 	
 	if(WITH_FREENECT2)
-		target_link_libraries(${LIB_NAME} ${FREENECT2_LIBRARIES})
+		target_link_libraries(${LIB_NAME} ${FREENECT2_LIBRARY})
 	endif()
 
     if (PCAP_FOUND)

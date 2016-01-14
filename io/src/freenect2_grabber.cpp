@@ -35,7 +35,7 @@
  *
  */
 
-#include <pcl/io/k4w2_grabber.h>
+#include <pcl/io/freenect2_grabber.h>
 #include <libfreenect2/packet_pipeline.h>
 
 pcl::k4w2Grabber::k4w2Grabber (processor p,
