@@ -38,7 +38,7 @@
 #include <pcl/io/freenect2_grabber.h>
 #include <libfreenect2/packet_pipeline.h>
 
-pcl::k4w2Grabber::k4w2Grabber (processor p,
+pcl::Freenect2Grabber::Freenect2Grabber (processor p,
                                std::string serial) :
     Grabber (),
     is_running_ (false),
@@ -100,33 +100,33 @@ pcl::k4w2Grabber::k4w2Grabber (processor p,
   dev_->setColorFrameListener (listener_);
   dev_->setIrAndDepthFrameListener (listener_);
 
-  point_cloud_rgb_signal_ = createSignal<sig_cb_k4w2_point_cloud_rgb> ();
+  point_cloud_rgb_signal_ = createSignal<sig_cb_freenect2_point_cloud_rgb> ();
 }
 
-pcl::k4w2Grabber::~k4w2Grabber () throw ()
+pcl::Freenect2Grabber::~Freenect2Grabber () throw ()
 {
   dev_->stop ();
   dev_->close ();
 
-  disconnect_all_slots<sig_cb_k4w2_point_cloud_rgb> ();
+  disconnect_all_slots<sig_cb_freenect2_point_cloud_rgb> ();
 }
 
 void
-pcl::k4w2Grabber::start ()
+pcl::Freenect2Grabber::start ()
 {
   if (!is_running_)
   {
-    need_xyzrgb_ = num_slots<sig_cb_k4w2_point_cloud_rgb> () > 0;
+    need_xyzrgb_ = num_slots<sig_cb_freenect2_point_cloud_rgb> () > 0;
 
     frequency_.reset ();
 
     is_running_ = true;
-    thread_ = boost::thread (&k4w2Grabber::run, this);
+    thread_ = boost::thread (&Freenect2Grabber::run, this);
   }
 }
 
 void
-pcl::k4w2Grabber::stop ()
+pcl::Freenect2Grabber::stop ()
 {
   if (is_running_)
   {
@@ -136,20 +136,20 @@ pcl::k4w2Grabber::stop ()
 }
 
 bool
-pcl::k4w2Grabber::isRunning () const
+pcl::Freenect2Grabber::isRunning () const
 {
   return (is_running_);
 }
 
 float
-pcl::k4w2Grabber::getFramesPerSecond () const
+pcl::Freenect2Grabber::getFramesPerSecond () const
 {
   boost::mutex::scoped_lock lock (fps_mutex_);
   return (frequency_.getFrequency ());
 }
 
 void
-pcl::k4w2Grabber::prepareMake3D (const libfreenect2::Freenect2Device::IrCameraParams & depth_p)
+pcl::Freenect2Grabber::prepareMake3D (const libfreenect2::Freenect2Device::IrCameraParams & depth_p)
 {
   const int w = 512;
   const int h = 424;
@@ -166,7 +166,7 @@ pcl::k4w2Grabber::prepareMake3D (const libfreenect2::Freenect2Device::IrCameraPa
 }
 
 void
-pcl::k4w2Grabber::run ()
+pcl::Freenect2Grabber::run ()
 {
   dev_->start ();
 

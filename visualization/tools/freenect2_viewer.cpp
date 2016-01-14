@@ -60,24 +60,24 @@ printHelp (int,
 }
 
 template <typename PointT>
-class k4w2Viewer
+class Freenect2Viewer
 {
 
   public:
 
     typedef pcl::PointCloud<PointT> PointCloudT;
 
-    k4w2Viewer (pcl::k4w2Grabber& grabber) :
+    Freenect2Viewer (pcl::Freenect2Grabber& grabber) :
         grabber_ (grabber),
-        viewer_ ("k4w2 Viewer")
+        viewer_ ("Freenect2 Viewer")
     {
       viewer_.setCameraFieldOfView (0.785398);  // approximately 45 degrees
       viewer_.setCameraPosition (0, 0, 0, 0, 0, 1, 0, 1, 0);
-      viewer_.registerKeyboardCallback (&k4w2Viewer::keyboardCallback, *this);
-      viewer_.registerPointPickingCallback (&k4w2Viewer::pointPickingCallback, *this);
+      viewer_.registerKeyboardCallback (&Freenect2Viewer::keyboardCallback, *this);
+      viewer_.registerPointPickingCallback (&Freenect2Viewer::pointPickingCallback, *this);
     }
 
-    ~k4w2Viewer ()
+    ~Freenect2Viewer ()
     {
       connection_.disconnect ();
     }
@@ -86,7 +86,7 @@ class k4w2Viewer
     run ()
     {
       boost::function<void
-      (const typename PointCloudT::ConstPtr&)> f = boost::bind (&k4w2Viewer::cloudCallback, this, _1);
+      (const typename PointCloudT::ConstPtr&)> f = boost::bind (&Freenect2Viewer::cloudCallback, this, _1);
       connection_ = grabber_.registerCallback (f);
       grabber_.start ();
 
@@ -152,7 +152,7 @@ class k4w2Viewer
       pcl::console::print_value ("%.3f\n", z);
     }
 
-    pcl::k4w2Grabber& grabber_;
+    pcl::Freenect2Grabber& grabber_;
     pcl::visualization::PCLVisualizer viewer_;
     boost::signals2::connection connection_;
 
@@ -165,7 +165,7 @@ int
 main (int argc,
       char** argv)
 {
-  print_info ("Viewer for K4W2 devices (run with --help for more information)\n", argv[0]);
+  print_info ("Viewer for Freenect2 devices (run with --help for more information)\n", argv[0]);
 
   if (find_switch (argc, argv, "--help") || find_switch (argc, argv, "-h"))
   {
@@ -189,9 +189,9 @@ main (int argc,
 
   try
   {
-    pcl::k4w2Grabber grabber (pcl::OPENGL);
+    pcl::Freenect2Grabber grabber (pcl::OPENGL);
 
-    k4w2Viewer<pcl::PointXYZRGB> viewer (grabber);
+    Freenect2Viewer<pcl::PointXYZRGB> viewer (grabber);
     viewer.run ();
   }
   catch (pcl::io::IOException& e)

@@ -62,16 +62,16 @@ namespace pcl
     CPU, OPENCL, OPENGL
   };
 
-class PCL_EXPORTS k4w2Grabber : public Grabber
+class PCL_EXPORTS Freenect2Grabber : public Grabber
 {
   public:
   typedef
-  void (sig_cb_k4w2_point_cloud_rgb)
+  void (sig_cb_freenect2_point_cloud_rgb)
   (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr&);
 
-  k4w2Grabber(processor p = CPU, std::string serial = std::string());
+  Freenect2Grabber(processor p = CPU, std::string serial = std::string());
   virtual
-  ~k4w2Grabber() throw();
+  ~Freenect2Grabber() throw();
 
   virtual bool
   isRunning() const;
@@ -85,7 +85,7 @@ class PCL_EXPORTS k4w2Grabber : public Grabber
   virtual std::string
   getName() const
   {
-    return (std::string("K4W2Grabber"));
+    return (std::string("Freenect2Grabber"));
   }
 
   virtual std::string
@@ -104,7 +104,7 @@ class PCL_EXPORTS k4w2Grabber : public Grabber
   void prepareMake3D(const libfreenect2::Freenect2Device::IrCameraParams & depth_p);
 
   // Signals to indicate whether new clouds are available
-  boost::signals2::signal<sig_cb_k4w2_point_cloud_rgb>* point_cloud_rgb_signal_;
+  boost::signals2::signal<sig_cb_freenect2_point_cloud_rgb>* point_cloud_rgb_signal_;
 
   boost::thread thread_;
 
