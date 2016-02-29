@@ -52,11 +52,11 @@
 using namespace pcl::console;
 
 void
-printHelp (int,
-           char **argv)
+printHelp ()
 {
   PCL_INFO ("Creates a point cloud grabber for the kinect2\n");
-  PCL_INFO ("Accepts as constructor parameter a string specifying a kinect2 serial number\n");
+  PCL_INFO ("Accepts as constructor parameter an integer [-processor 0|1|2|3] corresponding to CPU, OPENCL, OPENGL, CUDA depth packet processor and \n");
+  PCL_INFO ("a string specifying a kinect2 serial number\n");
 }
 
 template <typename PointT>
@@ -169,27 +169,37 @@ main (int argc,
 
   if (find_switch (argc, argv, "--help") || find_switch (argc, argv, "-h"))
   {
-    printHelp (argc, argv);
+    printHelp ();
     return (0);
   }
 
   std::string device_id;
+  unsigned int processor;
+  device_id = "";
 
   if (argc == 1)  // single argument
   {
-    device_id = "";
+    processor = 0;
     print_info ("Creating a grabber for the first available device\n");
   }
-  else
+
+  if (argc == 2)
   {
-    device_id = argv[argc - 1];
+    processor = atoi(argv[1]);
+    print_info ("Creating a grabber for device ");
+    print_value ("%s\n", device_id.c_str ()); 
+  }
+  if (argc == 3)
+  {
+    processor = atoi(argv[1]);
+    device_id = argv[2];
     print_info ("Creating a grabber for device ");
     print_value ("%s\n", device_id.c_str ());
   }
 
   try
   {
-    pcl::Freenect2Grabber grabber (pcl::OPENGL);
+    pcl::Freenect2Grabber grabber ((pcl::processor)processor);
 
     Freenect2Viewer<pcl::PointXYZRGB> viewer (grabber);
     viewer.run ();

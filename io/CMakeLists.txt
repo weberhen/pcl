@@ -162,6 +162,13 @@ if(build)
 	
 	if(WITH_FREENECT2)
         option(WITH_OPENCL "adds opencl support for freenect2" OFF)
+        if(${WITH_OPENCL})
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWITH_OPENCL")
+        endif()
+        option(WITH_CUDA "adds cuda support for freenect2" OFF)
+        if(${WITH_CUDA})
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWITH_CUDA")
+        endif()
 		set(FREENECT2_GRABBER_INCLUDES
 			include/pcl/io/freenect2_grabber.h
 		)
@@ -370,7 +377,11 @@ if(build)
     endif()
 	
 	if(WITH_FREENECT2)
-		target_link_libraries(${LIB_NAME} ${FREENECT2_LIBRARY})
+        if(WITH_CUDA)
+		  target_link_libraries(${LIB_NAME} ${FREENECT2_LIBRARY} ${CUDA_LIBRARIES})
+        else()
+          target_link_libraries(${LIB_NAME} ${FREENECT2_LIBRARY})
+        endif()
 	endif()
 
     if (PCAP_FOUND)
