@@ -42,10 +42,10 @@ pcl::Freenect2Grabber::Freenect2Grabber (processor p,
                                std::string serial) :
     Grabber (),
     is_running_ (false),
-    qnan_ (std::numeric_limits<float>::quiet_NaN ()),
     undistorted_ (512, 424, 4),
     registered_ (512, 424, 4),
-    big_mat_ (1920, 1082, 4)
+    big_mat_ (1920, 1082, 4),
+    qnan_ (std::numeric_limits<float>::quiet_NaN ())
 {
   if (!serial.empty ())
   {
@@ -78,6 +78,15 @@ pcl::Freenect2Grabber::Freenect2Grabber (processor p,
       else
         dev_ = freenect2_.openDevice (serial_, new libfreenect2::OpenGLPacketPipeline ());
       break;
+#ifdef HAVE_CUDA
+      case CUDA:
+      std::cout << "creating Cuda processor" << std::endl;
+      if(serial_.empty())
+      dev_ = freenect2_.openDefaultDevice(new libfreenect2::CudaPacketPipeline());
+      else
+      dev_ = freenect2_.openDevice(serial_, new libfreenect2::CudaPacketPipeline());
+      break;
+#endif
     default:
       std::cout << "creating CPU processor" << std::endl;
       if (serial_.empty ())

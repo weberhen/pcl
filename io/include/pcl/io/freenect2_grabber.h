@@ -59,7 +59,7 @@ namespace pcl
 {
   enum processor
   {
-    CPU, OPENCL, OPENGL
+    CPU, OPENCL, OPENGL, CUDA
   };
 
 class PCL_EXPORTS Freenect2Grabber : public Grabber
