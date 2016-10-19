@@ -47,10 +47,14 @@
 #include <pcl/common/time.h>
 #include <pcl/console/print.h>
 
-#include <libfreenect2/libfreenect2.hpp>
-#include <libfreenect2/frame_listener_impl.h>
-#include <libfreenect2/registration.h>
-#include <libfreenect2/packet_pipeline.h>
+#include "/gel/usr/heweb4/freenect2/include/libfreenect2/libfreenect2.hpp"
+//#include <libfreenect2/libfreenect2.hpp>
+#include "/gel/usr/heweb4/freenect2/include/libfreenect2/frame_listener_impl.h"
+//#include <libfreenect2/frame_listener_impl.h>
+#include "/gel/usr/heweb4/freenect2/include/libfreenect2/registration.h"
+//#include <libfreenect2/registration.h>
+#include "/gel/usr/heweb4/freenect2/include/libfreenect2/packet_pipeline.h"
+//#include <libfreenect2/packet_pipeline.h>
 #include <Eigen/Core>
 
 #include <limits>

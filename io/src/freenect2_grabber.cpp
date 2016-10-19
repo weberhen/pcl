@@ -36,7 +36,8 @@
  */
 
 #include <pcl/io/freenect2_grabber.h>
-#include <libfreenect2/packet_pipeline.h>
+//#include <libfreenect2/packet_pipeline.h>
+#include "/gel/usr/heweb4/freenect2/include/libfreenect2/packet_pipeline.h"
 
 pcl::Freenect2Grabber::Freenect2Grabber (processor p,
                                std::string serial) :

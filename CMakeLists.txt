@@ -291,6 +291,8 @@ if(WITH_LIBUSB)
   endif(LIBUSB_1_FOUND)
 endif(WITH_LIBUSB)
 
+find_package(Freenect2 REQUIRED)
+
 # Dependencies for different grabbers
 PCL_ADD_GRABBER_DEPENDENCY("OpenNI" "OpenNI grabber support")
 PCL_ADD_GRABBER_DEPENDENCY("OpenNI2" "OpenNI2 grabber support")
@@ -340,6 +342,7 @@ endif(WITH_QHULL)
 option(WITH_CUDA "Build NVIDIA-CUDA support" TRUE)
 if(WITH_CUDA)
   include("${PCL_SOURCE_DIR}/cmake/pcl_find_cuda.cmake")
+  link_directories(/usr/local/cuda-8.0/lib64)
 endif(WITH_CUDA)
 
 option(WITH_QT "Build QT Front-End" TRUE)
