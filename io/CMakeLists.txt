@@ -5,7 +5,7 @@ set(SUBSYS_DEPS common octree)
 set(build TRUE)
 PCL_SUBSYS_OPTION(build "${SUBSYS_NAME}" "${SUBSYS_DESC}" ON)
 if(WIN32)
-    PCL_SUBSYS_DEPEND(build "${SUBSYS_NAME}" DEPS ${SUBSYS_DEPS} OPT_DEPS openni openni2 ensenso davidSDK dssdk rssdk pcap png vtk)
+    PCL_SUBSYS_DEPEND(build "${SUBSYS_NAME}" DEPS ${SUBSYS_DEPS} OPT_DEPS openni openni2 ensenso davidSDK dssdk rssdk pcap png vtk freenect2)
 else(WIN32)
     PCL_SUBSYS_DEPEND(build "${SUBSYS_NAME}" DEPS ${SUBSYS_DEPS} OPT_DEPS openni openni2 ensenso davidSDK dssdk pcap png vtk libusb-1.0)
 endif(WIN32)
@@ -159,6 +159,23 @@ if(build)
             src/real_sense/real_sense_device_manager.cpp
         )
     endif()
+	
+	if(WITH_FREENECT2)
+        option(WITH_OPENCL "adds opencl support for freenect2" OFF)
+        if(${WITH_OPENCL})
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWITH_OPENCL")
+        endif()
+        option(WITH_CUDA "adds cuda support for freenect2" OFF)
+        if(${WITH_CUDA})
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWITH_CUDA")
+        endif()
+		set(FREENECT2_GRABBER_INCLUDES
+			include/pcl/io/freenect2_grabber.h
+		)
+		set(FREENECT2_GRABBER_SOURCES
+			src/freenect2_grabber.cpp
+		)
+	endif()
 
     if(LIBUSB_1_FOUND)
         set(DINAST_GRABBER_INCLUDES
@@ -227,6 +244,7 @@ if(build)
         ${DAVIDSDK_GRABBER_SOURCES}
         ${DSSDK_GRABBER_SOURCES}
         ${RSSDK_GRABBER_SOURCES}
+		${FREENECT2_GRABBER_SOURCES}
         )
     if(PNG_FOUND)
       list(APPEND srcs
@@ -275,6 +293,7 @@ if(build)
         ${DAVIDSDK_GRABBER_INCLUDES}
         ${DSSDK_GRABBER_INCLUDES}
         ${RSSDK_GRABBER_INCLUDES}
+		${FREENECT2_GRABBER_INCLUDES}
         "include/pcl/${SUBSYS_NAME}/pxc_grabber.h"  # contains only depreciation note
         )
 
@@ -359,6 +378,14 @@ if(build)
     if(WITH_RSSDK)
       target_link_libraries(${LIB_NAME} ${RSSDK_LIBRARIES})
     endif()
+	
+	if(WITH_FREENECT2)
+        if(WITH_CUDA)
+		  target_link_libraries(${LIB_NAME} ${FREENECT2_LIBRARY} ${CUDA_LIBRARIES})
+        else()
+          target_link_libraries(${LIB_NAME} ${FREENECT2_LIBRARY})
+        endif()
+	endif()
 
     if (PCAP_FOUND)
       target_link_libraries("${LIB_NAME}" ${PCAP_LIBRARIES})
