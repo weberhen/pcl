@@ -114,7 +114,7 @@ class PCL_EXPORTS Freenect2Grabber : public Grabber
 
   bool is_running_;
 
-  /// Indicates whether there are subscribers for PointXYZRGBA signal,
+  /// Indicates whether there are subscribers for PointXYZRGB signal,
   /// computed and stored on start()
   bool need_xyzrgb_;
 

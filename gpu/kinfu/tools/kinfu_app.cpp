@@ -879,6 +879,7 @@ struct KinFuApp
 
    void source_cb1_oni(const boost::shared_ptr<openni_wrapper::DepthImage>& depth_wrapper)
   {
+      cout<<"source_cb1_oni"<<endl;
     {
       boost::mutex::scoped_lock lock(data_ready_mutex_);
       if (exit_)
@@ -897,6 +898,7 @@ struct KinFuApp
 
   void source_cb2_oni(const boost::shared_ptr<openni_wrapper::Image>& image_wrapper, const boost::shared_ptr<openni_wrapper::DepthImage>& depth_wrapper, float)
   {
+      cout<<"source_cb2_oni"<<endl;
     {
       boost::mutex::scoped_lock lock(data_ready_mutex_);
       if (exit_)
@@ -922,7 +924,7 @@ struct KinFuApp
   }
 
   void
-  source_cb3 (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr & DC3)
+  source_cb3 (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr & DC3)
   {
     {
       boost::mutex::scoped_try_lock lock(data_ready_mutex_);
@@ -945,7 +947,7 @@ struct KinFuApp
 
       for (int i=0; i < width*height; i++)
       {
-        PointXYZRGBA pt = DC3->at (i);
+        PointXYZRGB pt = DC3->at (i);
         rgb[3*i +0] = pt.r;
         rgb[3*i +1] = pt.g;
         rgb[3*i +2] = pt.b;
@@ -975,14 +977,15 @@ struct KinFuApp
     boost::function<void (const ImagePtr&, const DepthImagePtr&, float constant)> func1 = is_oni ? func1_oni : func1_dev;
     boost::function<void (const DepthImagePtr&)> func2 = is_oni ? func2_oni : func2_dev;
 
-    boost::function<void (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr&) > func3 = boost::bind (&KinFuApp::source_cb3, this, _1);
+    boost::function<void (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr&) > func3 = boost::bind (&KinFuApp::source_cb3, this, _1);
 
     bool need_colors = integrate_colors_ || registration_;
-    if ( pcd_source_ && !capture_.providesCallback<void (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr&)>() )
+    if ( pcd_source_ && !capture_.providesCallback<void (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr&)>() )
     {
-      std::cout << "grabber doesn't provide pcl::PointCloud<pcl::PointXYZRGBA> callback !\n";
+      std::cout << "grabber doesn't provide pcl::PointCloud<pcl::PointXYZRGB> callback !\n";
     }
-    boost::signals2::connection c = pcd_source_? capture_.registerCallback (func3) : need_colors ? capture_.registerCallback (func1) : capture_.registerCallback (func2);
+    //boost::signals2::connection c = pcd_source_? capture_.registerCallback (func3) : need_colors ? capture_.registerCallback (func1) : capture_.registerCallback (func2);
+    boost::signals2::connection c = capture_.registerCallback (func3);
 
     {
       boost::unique_lock<boost::mutex> lock(data_ready_mutex_);
@@ -1237,7 +1240,7 @@ main (int argc, char* argv[])
   pcl::gpu::printShortCudaDeviceInfo (device);
 
 //  if (checkIfPreFermiGPU(device))
-    return cout << endl << "Kinfu is supported only for Fermi and Kepler arhitectures. It is not even compiled for pre-Fermi by default. Exiting..." << endl, 1;
+// return cout << endl << "Kinfu is supported only for Fermi and Kepler arhitectures. It is not even compiled for pre-Fermi by default. Exiting..." << endl, 1;
 
   boost::shared_ptr<pcl::Grabber> capture;
 
@@ -1268,7 +1271,7 @@ main (int argc, char* argv[])
 
       // Sort the read files by name
       sort (pcd_files.begin (), pcd_files.end ());
-      capture.reset (new pcl::PCDGrabber<pcl::PointXYZRGBA> (pcd_files, fps_pcd, false));
+      capture.reset (new pcl::PCDGrabber<pcl::PointXYZRGB> (pcd_files, fps_pcd, false));
       triggered_capture = true;
       pcd_input = true;
     }

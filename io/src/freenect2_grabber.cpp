@@ -53,49 +53,14 @@ pcl::Freenect2Grabber::Freenect2Grabber (processor p,
     serial_ = serial;
   }
 
-  switch (p)
-  {
-    case CPU:
-      std::cout << "creating CPU processor" << std::endl;
-      if (serial_.empty ())
-        dev_ = freenect2_.openDefaultDevice (new libfreenect2::CpuPacketPipeline ());
-      else
-        dev_ = freenect2_.openDevice (serial_, new libfreenect2::CpuPacketPipeline ());
-      std::cout << "created" << std::endl;
-      break;
-#ifdef HAVE_OPENCL
-      case OPENCL:
-      std::cout << "creating OpenCL processor" << std::endl;
-      if(serial_.empty())
-      dev_ = freenect2_.openDefaultDevice(new libfreenect2::OpenCLPacketPipeline());
-      else
-      dev_ = freenect2_.openDevice(serial_, new libfreenect2::OpenCLPacketPipeline());
-      break;
-#endif
-    case OPENGL:
-      std::cout << "creating OpenGL processor" << std::endl;
-      if (serial_.empty ())
-        dev_ = freenect2_.openDefaultDevice (new libfreenect2::OpenGLPacketPipeline ());
-      else
-        dev_ = freenect2_.openDevice (serial_, new libfreenect2::OpenGLPacketPipeline ());
-      break;
-#ifdef HAVE_CUDA
-      case CUDA:
+
       std::cout << "creating Cuda processor" << std::endl;
       if(serial_.empty())
       dev_ = freenect2_.openDefaultDevice(new libfreenect2::CudaPacketPipeline());
       else
       dev_ = freenect2_.openDevice(serial_, new libfreenect2::CudaPacketPipeline());
-      break;
-#endif
-    default:
-      std::cout << "creating CPU processor" << std::endl;
-      if (serial_.empty ())
-        dev_ = freenect2_.openDefaultDevice (new libfreenect2::CpuPacketPipeline ());
-      else
-        dev_ = freenect2_.openDevice (serial_, new libfreenect2::CpuPacketPipeline ());
-      break;
-  }
+
+
 
   listener_ = new libfreenect2::SyncMultiFrameListener (libfreenect2::Frame::Color | libfreenect2::Frame::Ir | libfreenect2::Frame::Depth);
 
